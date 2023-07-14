@@ -1,0 +1,30 @@
+CREATE TABLE CLIENTE (
+    id INTEGER AUTO_INCREMENT,
+    nome VARCHAR(255),
+
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE PRODUTO (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    descricao VARCHAR(255),
+    preco_unitario NUMERIC(20,2)
+);
+
+CREATE TABLE PEDIDO (
+    id INTEGER AUTO_INCREMENT,
+    cliente_id INTEGER REFERENCES CLIENTE (id),
+    data_pedido TIMESTAMP,
+    total NUMERIC(20,2),
+
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE ITEM_PEDIDO (
+    id INTEGER AUTO_INCREMENT,
+    pedido_id INTEGER REFERENCES PEDIDO (id),
+    produto_id INTEGER REFERENCES PRODUTO (id),
+    quantidade INTEGER,
+
+    PRIMARY KEY (id)
+);
