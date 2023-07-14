@@ -2,8 +2,17 @@ package com.br.vendas4.domain.entity;
 
 public class Cliente {
 
-    private String id;
+    private Integer id;
     private String nome;
+
+    public Cliente(String nome) {
+        this.nome = nome;
+    }
+
+    public Cliente(Integer id, String nome) {
+        this.id = id;
+        this.nome = nome;
+    }
 
     public String getNome() {
         return nome;
@@ -13,11 +22,19 @@ public class Cliente {
         this.nome = nome;
     }
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return "Cliente{" +
+                "id='" + id + '\'' +
+                ", nome='" + nome + '\'' +
+                '}';
     }
 }
