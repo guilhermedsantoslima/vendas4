@@ -1,62 +1,27 @@
 package com.br.vendas4.domain.repository;
 
 import com.br.vendas4.domain.entity.Cliente;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
-@Repository
-public class Clientes {
-    private static String INSERT = "insert into cliente (nome) values (?)";
-    private static String SELECT_ALL = "SELECT * FROM CLIENTE ";
-    private static String UPDATE = "update cliente set nome = ? where id = ? ";
-    private static String DELETE = "delete from cliente where id = ? ";
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-    public Cliente salvar(Cliente cliente){
-        jdbcTemplate.update(INSERT, new Object[]{cliente.getNome()});
+public interface Clientes extends JpaRepository<Cliente, Integer> {
 
-        return cliente;
-    }
-    public Cliente atualizar(Cliente cliente){
-        jdbcTemplate.update(UPDATE, new Object[]{
-              cliente.getNome(), cliente.getId()
-        });
+    @Query(value = " select * from Cliente c where c.nome like ':%nome%' ", nativeQuery = true)
+    List<Cliente> encontrarPorNome(@Param("nome") String nome);
+    @Query(" delete from Cliente c where c.nome =:nome ")
+    @Modifying
+    void deleteByNome(String nome);
 
-        return cliente;
-    }
+    boolean existsByNome(String nome);
 
-    public void deletar(Cliente cliente){
-        deletar(cliente.getId());
-    }
+    @Query(" select c from Cliente c left join fetch c.pedidos where c.id = :id ")
+    Cliente findClienteFetchPedidos(@Param("id") Integer id);
 
-    public void deletar(Integer id){
-        jdbcTemplate.update(DELETE, new Object[]{id});
-    }
-    
-    public List<Cliente> buscarPorNome(String nome){
-       return jdbcTemplate.query(SELECT_ALL.concat(" where nome = ?"), new Object[]{"%" + nome + "%" }, obterClienteMapper() );
-    }
 
-    public List<Cliente> obterTodos() {
-        return jdbcTemplate.query(SELECT_ALL, obterClienteMapper());
-      }
-
-    private static RowMapper<Cliente> obterClienteMapper() {
-        return new RowMapper<Cliente>() {
-            @Override
-            public Cliente mapRow(ResultSet resultSet, int i) throws SQLException {
-                Integer id = resultSet.getInt("id");
-                String nome = resultSet.getString("nome");
-
-                return new Cliente(id, nome);
-            }
-        };
-    }
 }
+
 
