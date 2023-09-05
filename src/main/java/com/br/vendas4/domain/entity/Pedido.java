@@ -1,5 +1,6 @@
 package com.br.vendas4.domain.entity;
 
+import com.br.vendas4.domain.enums.StatusPedido;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,6 +30,10 @@ public class Pedido {
 
     @Column(name = "total", precision = 20, scale = 2)
     private BigDecimal total;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private StatusPedido status;
 
     @OneToMany(mappedBy = "pedido")
     private List<ItemPedido> itens;

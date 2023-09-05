@@ -4,10 +4,12 @@ import com.br.vendas4.domain.entity.Cliente;
 import com.br.vendas4.domain.entity.ItemPedido;
 import com.br.vendas4.domain.entity.Pedido;
 import com.br.vendas4.domain.entity.Produto;
+import com.br.vendas4.domain.enums.StatusPedido;
 import com.br.vendas4.domain.repository.Clientes;
 import com.br.vendas4.domain.repository.ItensPedido;
 import com.br.vendas4.domain.repository.Pedidos;
 import com.br.vendas4.domain.repository.Produtos;
+import com.br.vendas4.exception.PedidoNaoEncontradoException;
 import com.br.vendas4.exception.RegraNegocioException;
 import com.br.vendas4.rest.dto.ItemPedidoDTO;
 import com.br.vendas4.rest.dto.PedidoDTO;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,8 +50,9 @@ public class PedidoServiceImpl implements PedidoService {
         pedido.setTotal(pedidoDTO.getTotal());
         pedido.setDataPedido(LocalDate.now());
         pedido.setCliente(cliente);
+        pedido.setStatus(StatusPedido.REALIZADO);
 
-        List<ItemPedido> itemsPedidos = converterItems(pedido, pedidoDTO.getItens());
+        List<ItemPedido> itemsPedidos = converterItens(pedido, pedidoDTO.getItens());
         repository.save(pedido);
         itensPedidoRepository.saveAll(itemsPedidos);
         pedido.setItens(itemsPedidos);
@@ -56,12 +60,26 @@ public class PedidoServiceImpl implements PedidoService {
         return pedido;
     }
 
-    private List<ItemPedido> converterItems(Pedido pedido,List<ItemPedidoDTO> items){
-        if(items.isEmpty()){
+    @Override
+    public Optional<Pedido> obterPedidoCompleto(Integer id) {
+        return repository.findByIdFetchItens(id);
+    }
+
+    @Override
+    @Transactional
+    public void atualizaStatus(Integer id, StatusPedido statusPedido) {
+        repository.findById(id).map(pedido -> {
+            pedido.setStatus(statusPedido);
+            return repository.save(pedido);
+        }).orElseThrow(()-> new PedidoNaoEncontradoException());
+    }
+
+    private List<ItemPedido> converterItens(Pedido pedido,List<ItemPedidoDTO> itens){
+        if(itens.isEmpty()){
             throw new RegraNegocioException("Não é possível realizar um pedido sem itens.");
         }
 
-        return items.stream().map(dto ->{
+        return itens.stream().map(dto ->{
             Integer idProduto = dto.getProduto();
             Produto produto = produtosRepository.findById(idProduto)
                     .orElseThrow(() -> new RegraNegocioException("Código de produto inválido: "+ idProduto));

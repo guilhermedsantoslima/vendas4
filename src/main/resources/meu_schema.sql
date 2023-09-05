@@ -1,6 +1,7 @@
 CREATE TABLE CLIENTE (
     id INTEGER AUTO_INCREMENT,
     nome VARCHAR(255),
+    cpf VARCHAR(11),
 
     PRIMARY KEY (id)
 );
@@ -15,6 +16,7 @@ CREATE TABLE PEDIDO (
     id INTEGER PRIMARY KEY AUTO_INCREMENT,
     cliente_id INTEGER REFERENCES CLIENTE (id),
     data_pedido TIMESTAMP,
+    status VARCHAR(20),
     total NUMERIC(20,2)
 );
 
