@@ -2,6 +2,7 @@ package com.br.vendas4.rest.controller;
 
 import com.br.vendas4.domain.entity.Produto;
 import com.br.vendas4.domain.repository.Produtos;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -28,13 +29,13 @@ public class ProdutoController {
     }
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Produto save(@RequestBody Produto produto){
+    public Produto save(@RequestBody @Valid Produto produto){
         return produtos.save(produto);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void update(@PathVariable ("id") Integer id, @RequestBody Produto produto){
+    public void update(@PathVariable ("id") Integer id, @RequestBody @Valid Produto produto){
         produtos.findById(id).map(produtoExistente ->{
             produto.setId(produtoExistente.getId());
 

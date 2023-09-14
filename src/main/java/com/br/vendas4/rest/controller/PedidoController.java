@@ -8,6 +8,7 @@ import com.br.vendas4.rest.dto.InformacaoItemPedidoDTO;
 import com.br.vendas4.rest.dto.InformacoesPedidoDTO;
 import com.br.vendas4.rest.dto.PedidoDTO;
 import com.br.vendas4.service.PedidoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.CollectionUtils;
@@ -28,7 +29,7 @@ public class PedidoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Integer save(@RequestBody PedidoDTO pedidoDTO){
+    public Integer save(@RequestBody @Valid PedidoDTO pedidoDTO){
         Pedido pedido = service.salvar(pedidoDTO);
 
         return pedido.getId();
